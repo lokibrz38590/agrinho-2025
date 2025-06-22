@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Cadastro LGPD</title>
+    <title>Agrinho - Cadastro de Participantes</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="sketch.js"></script>
+    <script src="sketch.js" defer></script>
 </head>
 <body>
     <!-- Cabeçalho -->
     <header>
         <div class="container">
             <nav>
-                <div class="logo">Agrinho</div> 
+                <div class="logo">Agrinho</div>
                 <div class="nav-links">
                     <a href="#" id="homeLink">Início</a>
                     <a href="#" id="registerLink">Cadastro</a>
-                    <a href="#" id="dataLink">pagina do participante</a>
+                    <a href="#" id="dataLink">Área do Participante</a>
                 </div>
             </nav>
         </div>
@@ -26,15 +26,16 @@
     <!-- Página Inicial -->
     <section id="homePage" class="hero">
         <div class="container">
-            <h1>Bem-vindo ao Agrinho</h1>
-            <a href="#" id="startRegister" class="btn">Realizar Cadastro</a>
+            <h1>Bem-vindo ao Programa Agrinho</h1>
+            <p>Cadastre-se para participar do maior programa de educação do campo!</p>
+            <a href="#" id="startRegister" class="btn">Quero me Cadastrar</a>
         </div>
     </section>
 
     <!-- Formulário de Cadastro -->
     <div class="container">
         <div id="registerForm" class="form-container">
-            <h2>Formulário de Cadastro</h2>
+            <h2>Formulário de Inscrição</h2>
             <form id="cadastroForm">
                 <div class="form-group">
                     <label for="nome">Nome Completo*</label>
@@ -49,47 +50,48 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="telefone">Telefone</label>
-                    <input type="tel" id="telefone" name="telefone">
+                    <label for="telefone">Telefone/WhatsApp</label>
+                    <input type="tel" id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX">
                 </div>
                 
                 <div class="consent-box">
-                    <h3>Termos de Consentimento</h3>
+                    <h3>Termos de Participação</h3>
                     
                     <div class="consent-item">
                         <input type="checkbox" id="consentMarketing" name="consentMarketing">
-                        <label for="consentMarketing">Aceito receber comunicações de marketing</label>
+                        <label for="consentMarketing">Desejo receber informações sobre o Agrinho</label>
                     </div>
                     
                     <div class="consent-item">
                         <input type="checkbox" id="consentDados" name="consentDados" required>
-                        <label for="consentDados">Li e concordo com a Política de Privacidade*</label>
+                        <label for="consentDados">Li e aceito os Termos de Uso e Política de Privacidade*</label>
                         <div id="consentError" class="error"></div>
                     </div>
                 </div>
                 
-                <button type="submit" class="btn-submit">Cadastrar</button>
+                <button type="submit" class="btn-submit">Confirmar Inscrição</button>
             </form>
         </div>
     </div>
 
-    <!-- Painel de Dados -->
+    <!-- Área do Participante -->
     <div class="container">
         <div id="dataPanel" class="data-panel">
-            <h2>Meus Dados Cadastrados</h2>
+            <h2>Minha Inscrição</h2>
             <div id="userDataDisplay" class="data-info"></div>
-            <button id="deleteDataBtn" class="btn-submit" style="background-color: #e74c3c;">Deletar Meus Dados</button>
+            <button id="deleteDataBtn" class="btn-submit danger">Remover Meus Dados</button>
         </div>
     </div>
 
-    <!-- Canvas p5.js -->
-    <div id="canvas-container"></div>
+    <!-- Visualização p5.js -->
+    <div id="canvas-container" class="container"></div>
 
     <!-- Rodapé -->
     <footer>
         <div class="container">
-            <p>sistema desenvolvido para o cadastro doas alunos da rede estadual para o projeto do agrinho</p>
-            <p>© 2025 Todos os seus  direitos serão reservados</p>
+            <p>Sistema de cadastro para participantes do Programa Agrinho</p>
+            <p>Conforme Lei Geral de Proteção de Dados (LGPD - Lei 13.709/2018)</p>
+            <p>© <span id="currentYear"></span> Todos os direitos reservados</p>
         </div>
     </footer>
 </body>
