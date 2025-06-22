@@ -1,0 +1,222 @@
+// Variáveis globais
+let userData = null;
+
+// Função principal do p5.js
+function setup() {
+    // Criar canvas
+    const canvas = createCanvas(800, 200);
+    canvas.parent('canvas-container');
+    background(240);
+    
+    // Carregar dados do usuário
+    loadUserData();
+    
+    // Configurar elementos após o carregamento do DOM
+    setTimeout(() => {
+        setupEventListeners();
+    }, 100);
+    
+    // Mostrar página inicial por padrão
+    showHomePage();
+}
+
+function draw() {
+    background(240);
+    fill(0);
+    textSize(24);
+    text('Visualização de Dados LGPD', 50, 50);
+    
+    if (userData) {
+        textSize(16);
+        text(`Usuário: ${userData.nome}`, 50, 100);
+        text(`Status: Cadastro ativo`, 50, 130);
+        fill(0, 128, 0);
+    } else {
+        text('Nenhum usuário cadastrado', 50, 100);
+        fill(128, 0, 0);
+    }
+    
+    // Desenhar indicador de status
+    ellipse(width - 50, 50, 30, 30);
+}
+
+// Configura todos os event listeners
+function setupEventListeners() {
+    // Elementos de navegação
+    const homeLink = document.getElementById('homeLink');
+    const registerLink = document.getElementById('registerLink');
+    const dataLink = document.getElementById('dataLink');
+    const startRegister = document.getElementById('startRegister');
+    
+    // Configurar eventos de navegação
+    if (homeLink) homeLink.addEventListener('click', showHomePage);
+    if (registerLink) registerLink.addEventListener('click', showRegisterForm);
+    if (dataLink) dataLink.addEventListener('click', showDataPanel);
+    if (startRegister) startRegister.addEventListener('click', showRegisterForm);
+    
+    // Configurar formulário
+    const form = document.getElementById('cadastroForm');
+    if (form) form.addEventListener('submit', handleFormSubmit);
+    
+    // Configurar botão de deletar dados
+    const deleteDataBtn = document.getElementById('deleteDataBtn');
+    if (deleteDataBtn) deleteDataBtn.addEventListener('click', handleDeleteData);
+}
+
+// Funções de navegação
+function showHomePage(e) {
+    if (e) e.preventDefault();
+    const homePage = document.getElementById('homePage');
+    const registerForm = document.getElementById('registerForm');
+    const dataPanel = document.getElementById('dataPanel');
+    
+    if (homePage) homePage.style.display = 'block';
+    if (registerForm) registerForm.style.display = 'none';
+    if (dataPanel) dataPanel.style.display = 'none';
+}
+
+function showRegisterForm(e) {
+    if (e) e.preventDefault();
+    const homePage = document.getElementById('homePage');
+    const registerForm = document.getElementById('registerForm');
+    const dataPanel = document.getElementById('dataPanel');
+    
+    if (homePage) homePage.style.display = 'none';
+    if (registerForm) {
+        registerForm.style.display = 'block';
+        // Resetar formulário e mensagens de erro
+        document.getElementById('cadastroForm').reset();
+        document.querySelectorAll('.error').forEach(el => el.textContent = '');
+    }
+    if (dataPanel) dataPanel.style.display = 'none';
+}
+
+function showDataPanel(e) {
+    if (e) e.preventDefault();
+    const homePage = document.getElementById('homePage');
+    const registerForm = document.getElementById('registerForm');
+    const dataPanel = document.getElementById('dataPanel');
+    
+    if (homePage) homePage.style.display = 'none';
+    if (registerForm) registerForm.style.display = 'none';
+    
+    if (userData) {
+        if (dataPanel) {
+            dataPanel.style.display = 'block';
+            updateDataDisplay();
+        }
+    } else {
+        alert('Nenhum dado cadastrado encontrado.');
+        showRegisterForm();
+    }
+}
+
+// Funções de manipulação de dados
+function loadUserData() {
+    try {
+        const savedData = localStorage.getItem('lgpdUserData');
+        if (savedData) {
+            userData = JSON.parse(savedData);
+        }
+    } catch (e) {
+        console.error('Erro ao carregar dados:', e);
+        localStorage.removeItem('lgpdUserData');
+        userData = null;
+    }
+}
+
+function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    // Limpar mensagens de erro
+    document.querySelectorAll('.error').forEach(el => el.textContent = '');
+    
+    // Validar formulário
+    if (!validateForm()) return;
+    
+    // Coletar dados do formulário
+    userData = {
+        nome: document.getElementById('nome').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        telefone: document.getElementById('telefone').value.trim(),
+        consentMarketing: document.getElementById('consentMarketing').checked,
+        consentDados: document.getElementById('consentDados').checked,
+        dataCadastro: new Date().toISOString()
+    };
+    
+    // Salvar dados
+    try {
+        localStorage.setItem('lgpdUserData', JSON.stringify(userData));
+        
+        // Feedback para o usuário
+        alert('Cadastro realizado com sucesso!');
+        
+        // Resetar formulário e mostrar painel de dados
+        document.getElementById('cadastroForm').reset();
+        updateDataDisplay();
+        showDataPanel();
+    } catch (e) {
+        console.error('Erro ao salvar dados:', e);
+        alert('Ocorreu um erro ao salvar seus dados. Por favor, tente novamente.');
+    }
+}
+
+function validateForm() {
+    let isValid = true;
+    
+    // Validar nome (mínimo 3 caracteres)
+    const nome = document.getElementById('nome').value.trim();
+    if (nome.length < 3) {
+        document.getElementById('nomeError').textContent = 'O nome deve conter pelo menos 3 caracteres';
+        isValid = false;
+    }
+    
+    // Validar e-mail
+    const email = document.getElementById('email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        document.getElementById('emailError').textContent = 'Por favor, insira um e-mail válido';
+        isValid = false;
+    }
+    
+    // Validar consentimento LGPD
+    if (!document.getElementById('consentDados').checked) {
+        document.getElementById('consentError').textContent = 'Você deve aceitar a Política de Privacidade para continuar';
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+function handleDeleteData() {
+    if (confirm('Tem certeza que deseja deletar TODOS os seus dados permanentemente?\nEsta ação não pode ser desfeita.')) {
+        try {
+            localStorage.removeItem('lgpdUserData');
+            userData = null;
+            alert('Seus dados foram removidos com sucesso!');
+            updateDataDisplay();
+            showHomePage();
+        } catch (e) {
+            console.error('Erro ao deletar dados:', e);
+            alert('Ocorreu um erro ao deletar seus dados. Por favor, tente novamente.');
+        }
+    }
+}
+
+function updateDataDisplay() {
+    const userDataDisplay = document.getElementById('userDataDisplay');
+    if (!userDataDisplay) return;
+    
+    if (userData) {
+        userDataDisplay.innerHTML = `
+            <p><strong>Nome:</strong> ${userData.nome}</p>
+            <p><strong>E-mail:</strong> ${userData.email}</p>
+            <p><strong>Telefone:</strong> ${userData.telefone || 'Não informado'}</p>
+            <p><strong>Recebe marketing:</strong> ${userData.consentMarketing ? 'Sim' : 'Não'}</p>
+            <p><strong>Data do cadastro:</strong> ${new Date(userData.dataCadastro).toLocaleDateString('pt-BR')}</p>
+            <p><strong>Hora do cadastro:</strong> ${new Date(userData.dataCadastro).toLocaleTimeString('pt-BR')}</p>
+        `;
+    } else {
+        userDataDisplay.innerHTML = '<p>Nenhum dado cadastrado encontrado.</p>';
+    }
+}
